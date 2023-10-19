@@ -7,7 +7,10 @@ class LinearFunction:
     def __init__(self, n_rows: int, n_cols: int, A: NDArray):
         self.n_rows = n_rows
         self.n_cols = n_cols
-        self.A = self.A
+        self.A = A
+
+    def __repr__(self):
+        return f"LinearFunction with {self.n_rows}x{self.n_cols} operating matrix."
 
     @property
     def n_rows(self):
@@ -26,7 +29,7 @@ class LinearFunction:
         return self.n_cols_
 
     @n_cols.setter
-    def n_rows(self, value: int):
+    def n_cols(self, value: int):
         if int(value) != float(value):
             raise ValueError(f"Expected integer for `n_cols`, got {type(value)}")
         self.n_cols_ = value
@@ -48,5 +51,19 @@ class LinearFunction:
         self.A_ = value
 
     def evaluate(self, x: NDArray):
-        assert x.shape[1] == self.n_rows
-        return x @ self.A
+        assert x.shape[0] == self.n_cols
+        return self.A @ x
+
+
+if __name__ == "__main__":
+    m = 42
+    n = 71
+    A = np.random.binomial(n=1, p=0.5, size=(m, n))
+    bernoulli_map = LinearFunction(m, n, A)
+    print(bernoulli_map)
+    x = np.random.binomial(n=1, p=0.5, size=(n, 1))
+    print(x.shape[1], n)
+    y = bernoulli_map.evaluate(x)
+    print(f"x: {x[:5].T}, y: {y[:5].T}")
+
+# (m x n) x (n, 1)
