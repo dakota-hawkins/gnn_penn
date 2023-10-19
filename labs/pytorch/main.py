@@ -9,8 +9,8 @@ class LinearFunction:
         self.n_cols = n_cols
         self.A = A
 
-    def __repr__(self):
-        return f"LinearFunction with {self.n_rows}x{self.n_cols} operating matrix."
+    def __repr__(self, name: str = "LinearFunction"):
+        return f"{name} with {self.n_rows}x{self.n_cols} operating matrix."
 
     @property
     def n_rows(self):
@@ -55,6 +55,15 @@ class LinearFunction:
         return self.A @ x
 
 
+class LinearBernoulli(LinearFunction):
+    def __init__(self, n_rows: int, n_cols: int):
+        A = np.random.binomial(n=1, p=0.5, size=(m, n))
+        super().__init__(n_rows, n_cols, A)
+
+    def __repr__(self):
+        return super().__repr__("LinearBernoulli")
+
+
 if __name__ == "__main__":
     m = 42
     n = 71
@@ -62,8 +71,10 @@ if __name__ == "__main__":
     bernoulli_map = LinearFunction(m, n, A)
     print(bernoulli_map)
     x = np.random.binomial(n=1, p=0.5, size=(n, 1))
-    print(x.shape[1], n)
     y = bernoulli_map.evaluate(x)
     print(f"x: {x[:5].T}, y: {y[:5].T}")
+    bernoulli_inhr = LinearBernoulli(m, n)
+    print(bernoulli_inhr)
+    print(f"x: {x[:5].T}, y: {bernoulli_inhr.evaluate(x)[:5].T}")
 
 # (m x n) x (n, 1)
