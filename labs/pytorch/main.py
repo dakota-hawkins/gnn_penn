@@ -1,6 +1,10 @@
 import typing
 import numpy as np
 from numpy.typing import NDArray
+import torch
+import torch.optim as optim
+
+from architectures import Parametrization, TwoLayerNN
 
 
 class LinearFunction:
@@ -50,7 +54,15 @@ class LinearFunction:
             )
         self.A_ = value
 
-    def evaluate(self, x: NDArray):
+    def evaluate(self, x: NDArray) -> NDArray:
+        """Evaluate linear map
+
+        Args:
+            x (NDArray): matrix to apply linear map to
+
+        Returns:
+            NDArray: predicted output
+        """
         assert x.shape[0] == self.n_cols
         return self.A @ x
 
@@ -62,6 +74,31 @@ class LinearBernoulli(LinearFunction):
 
     def __repr__(self):
         return super().__repr__("LinearBernoulli")
+
+
+def get_batch(batch_size, X, y) -> (torch.Tensor, torch.Tensor):
+    pass
+
+
+def train(
+    X: NDArray,
+    y: NDArray,
+    estimator: torch.nn.Parameter,
+    batch_size,
+    n_iters: int = 100,
+    eps: float = 10e-4,
+):
+    iter = 0
+    optimizer = optim.SGD(estimator.parameters(), lr=eps, momentum=0)
+
+    while iter < n_iters:
+        X_, y_ = get_batch(batch_size, X, y)
+        estimator.zero_grad()
+        y_hat = estimator.forward(X_)
+        loss = torch.mean((y_hat - y) ** 2)
+        loss.backward()
+        optimizer.step()
+        iter += 1
 
 
 if __name__ == "__main__":
@@ -76,5 +113,9 @@ if __name__ == "__main__":
     bernoulli_inhr = LinearBernoulli(m, n)
     print(bernoulli_inhr)
     print(f"x: {x[:5].T}, y: {bernoulli_inhr.evaluate(x)[:5].T}")
+
+    h = 35
+    two_layer_nn = TwoLayerNN(input_size=n, output_size=m, hidden_size=h)
+
 
 # (m x n) x (n, 1)
